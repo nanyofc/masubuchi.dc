@@ -1,0 +1,3039 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<title>QRを探せ！BINGOクイズラリー</title>
+
+<!-- QR読み取り -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Hiragino Kaku Gothic ProN",
+    "Yu Gothic",
+    sans-serif;
+  background:#f5fbfd;
+  color:#222;
+}
+
+body{
+  min-height:100vh;
+}
+
+button,
+select,
+input{
+  font:inherit;
+}
+
+button{
+  -webkit-tap-highlight-color:transparent;
+}
+
+.page{
+  display:none;
+  width:100%;
+  min-height:100vh;
+}
+
+.page.active{
+  display:block;
+}
+
+.container{
+  width:min(100%,640px);
+  margin:0 auto;
+  padding:18px 16px 40px;
+}
+
+.card{
+  background:#fff;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 4px 20px rgba(0,0,0,.08);
+}
+
+.title{
+  margin:0 0 14px;
+  font-size:26px;
+  text-align:center;
+}
+
+.sub{
+  color:#666;
+  line-height:1.7;
+  font-size:14px;
+}
+
+.btn{
+  display:block;
+  width:100%;
+  border:none;
+  border-radius:16px;
+  padding:17px 14px;
+  margin-top:14px;
+  font-size:17px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.btn-primary{
+  background:#12bde7;
+  color:#fff;
+}
+
+.btn-secondary{
+  background:#eef3f5;
+  color:#333;
+}
+
+.btn-gacha{
+  background:#ffb300;
+  color:#fff;
+  font-size:20px;
+}
+
+.btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.loading{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.82);
+}
+
+.loading.show{
+  display:flex;
+}
+
+.loading-box{
+  background:#fff;
+  padding:24px 30px;
+  border-radius:18px;
+  box-shadow:0 5px 30px rgba(0,0,0,.15);
+  font-weight:700;
+}
+
+
+/* =========================
+   TOP
+========================= */
+
+.top-image-wrap{
+  width:100%;
+  overflow:hidden;
+  background:#fff;
+}
+
+#topImage{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+#topDummy{
+  min-height:360px;
+  padding:45px 22px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  background:
+    linear-gradient(
+      160deg,
+      #e6f9fd,
+      #fff 55%,
+      #e8fbff
+    );
+}
+
+#topDummy h1{
+  margin:0;
+  font-size:31px;
+  line-height:1.35;
+}
+
+#topDummy .anniv{
+  margin-bottom:15px;
+  font-size:17px;
+  font-weight:800;
+  color:#11a9d0;
+}
+
+.top-actions{
+  padding:20px 16px 36px;
+  width:min(100%,640px);
+  margin:0 auto;
+}
+
+.notice{
+  margin-top:16px;
+  padding:14px 15px;
+  border-radius:14px;
+  background:#fff8dc;
+  line-height:1.6;
+  font-size:13px;
+}
+
+.restore-box{
+  margin-top:20px;
+  padding-top:18px;
+  border-top:1px solid #ddd;
+}
+
+.restore-row{
+  display:flex;
+  gap:8px;
+}
+
+.restore-row input{
+  flex:1;
+  min-width:0;
+  padding:15px;
+  border:1px solid #bbb;
+  border-radius:12px;
+  font-size:18px;
+  text-align:center;
+  letter-spacing:4px;
+}
+
+.restore-row button{
+  width:auto;
+  margin:0;
+  padding:12px 16px;
+}
+
+
+/* =========================
+   フォーム
+========================= */
+
+.field{
+  margin:18px 0;
+}
+
+.field label{
+  display:block;
+  margin-bottom:7px;
+  font-weight:700;
+}
+
+.field select{
+  width:100%;
+  padding:15px;
+  border:1px solid #bbb;
+  border-radius:12px;
+  background:#fff;
+}
+
+
+/* =========================
+   BINGO
+========================= */
+
+.bingo-head{
+  text-align:center;
+}
+
+.participant-no{
+  display:inline-block;
+  margin:4px 0 10px;
+  padding:8px 18px;
+  background:#222;
+  color:#fff;
+  border-radius:999px;
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:2px;
+}
+
+.bingo-count{
+  font-size:29px;
+  font-weight:900;
+  margin:8px 0 18px;
+  color:#08a9d2;
+}
+
+.bingo-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+  width:100%;
+}
+
+.bingo-cell{
+  aspect-ratio:1/1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+  background:#dfe5e8;
+  color:#777;
+  font-size:clamp(18px,6vw,30px);
+  font-weight:900;
+  border:2px solid #cbd3d7;
+}
+
+.bingo-cell.open{
+  background:#19bde6;
+  color:#fff;
+  border-color:#19bde6;
+  transform:scale(.97);
+}
+
+.unlock{
+  margin-top:18px;
+  padding:15px;
+  border-radius:15px;
+  text-align:center;
+  font-weight:800;
+}
+
+.unlock.locked{
+  background:#f1f1f1;
+  color:#777;
+}
+
+.unlock.open{
+  background:#fff0ba;
+  color:#9a6500;
+}
+
+.small-info{
+  text-align:center;
+  font-size:13px;
+  color:#777;
+  margin-top:10px;
+}
+
+
+/* =========================
+   クイズ
+========================= */
+
+.quiz-no{
+  display:inline-block;
+  background:#11bee8;
+  color:#fff;
+  font-weight:900;
+  border-radius:999px;
+  padding:7px 16px;
+  margin-bottom:15px;
+}
+
+.quiz-question{
+  font-size:22px;
+  line-height:1.6;
+  font-weight:800;
+  margin:10px 0 20px;
+}
+
+.quiz-image{
+  display:none;
+  width:100%;
+  border-radius:16px;
+  margin:8px 0 20px;
+}
+
+.choice{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-align:left;
+  background:#fff;
+  border:2px solid #d5e1e5;
+  border-radius:15px;
+  padding:14px;
+  margin:10px 0;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.choice-letter{
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  background:#11bee8;
+  color:white;
+  font-weight:900;
+}
+
+.quiz-message{
+  min-height:30px;
+  margin:12px 0;
+  text-align:center;
+  font-weight:900;
+}
+
+.quiz-message.wrong{
+  color:#e53935;
+}
+
+
+/* =========================
+   QR SCANNER
+========================= */
+
+#reader{
+  width:100%;
+  margin-top:15px;
+}
+
+.manual-box{
+  margin-top:20px;
+  padding-top:16px;
+  border-top:1px solid #ddd;
+}
+
+.manual-row{
+  display:flex;
+  gap:8px;
+}
+
+.manual-row input{
+  flex:1;
+  width:100%;
+  padding:14px;
+  border:1px solid #aaa;
+  border-radius:12px;
+  text-align:center;
+}
+
+
+/* =========================
+   GACHA
+========================= */
+
+.gacha-video{
+  display:block;
+  width:100%;
+  max-height:70vh;
+  background:#000;
+}
+
+.gacha-result{
+  display:none;
+  text-align:center;
+}
+
+.gacha-result img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+.gacha-result-title{
+  padding:16px;
+  font-size:28px;
+  font-weight:900;
+}
+
+.redeemed{
+  margin-top:12px;
+  padding:16px;
+  background:#ddd;
+  border-radius:14px;
+  text-align:center;
+  color:#666;
+  font-weight:900;
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+.system-message{
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:14px;
+  background:#fff3cd;
+  line-height:1.6;
+}
+
+@media(max-width:420px){
+
+  .container{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .card{
+    padding:16px;
+  }
+
+  .quiz-question{
+    font-size:19px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<div id="loading" class="loading">
+  <div class="loading-box">
+    読み込み中...
+  </div>
+</div>
+
+
+<!-- ========================================
+     TOP
+========================================= -->
+<section id="pageTop" class="page active">
+
+  <div class="top-image-wrap">
+
+    <img
+      id="topImage"
+      src="top.png"
+      alt="イベントTOP"
+      onload="showRealTop()"
+      onerror="showDummyTop()"
+    >
+
+    <div id="topDummy">
+      <div class="anniv">
+        10th ANNIVERSARY
+      </div>
+
+      <h1>
+        QRを探せ！<br>
+        BINGOクイズラリー
+      </h1>
+
+      <p class="sub">
+        院内にかくされたQRを探して<br>
+        クイズにチャレンジ！
+      </p>
+    </div>
+
+  </div>
+
+
+  <div class="top-actions">
+
+    <div id="eventMessage"></div>
+
+    <button
+      class="btn btn-primary"
+      onclick="showPage('pageProfile')"
+    >
+      ビンゴカードを発行する
+    </button>
+
+    <button
+      id="continueButton"
+      class="btn btn-secondary"
+      style="display:none"
+      onclick="continueGame()"
+    >
+      ビンゴのつづきから
+    </button>
+
+
+    <div class="notice">
+      <b>さんかしゃNOについて</b><br>
+      ビンゴカードをつくると、
+      4けたの「さんかしゃNO」が
+      ビンゴカードに表示されます。<br>
+      とちゅうで画面をとじたときに、
+      つづきからあそぶために使います。
+    </div>
+
+
+    <div class="restore-box">
+
+      <div class="sub">
+        画面を閉じてしまった場合
+      </div>
+
+      <div class="restore-row">
+
+        <input
+          id="restoreNo"
+          type="tel"
+          maxlength="4"
+          inputmode="numeric"
+          placeholder="4けた"
+        >
+
+        <button
+          class="btn btn-secondary"
+          onclick="restoreByNumber()"
+        >
+          復元
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ========================================
+     参加者情報
+========================================= -->
+<section id="pageProfile" class="page">
+
+  <div class="container">
+
+    <div class="card">
+
+      <h1 class="title">
+        さんかしゃ情報
+      </h1>
+
+      <p class="sub">
+        ビンゴカードを作る前に、
+        かんたんなアンケートに答えてね。
+      </p>
+
+
+      <div class="field">
+
+        <label>
+          年代
+        </label>
+
+        <select id="age">
+          <option value="">
+            選んでください
+          </option>
+          <option>10歳未満</option>
+          <option>10代</option>
+          <option>20代</option>
+          <option>30代</option>
+          <option>40代</option>
+          <option>50代</option>
+          <option>60代以上</option>
+        </select>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          お住まい
+        </label>
+
+        <select id="residence">
+          <option value="">
+            選んでください
+          </option>
+          <option>高畠町</option>
+          <option>南陽市</option>
+          <option>米沢市</option>
+          <option>川西町</option>
+          <option>それ以外の置賜地区</option>
+          <option>置賜地区以外</option>
+        </select>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          性別
+        </label>
+
+        <select id="gender">
+          <option value="">
+            選んでください
+          </option>
+          <option>男性</option>
+          <option>女性</option>
+          <option>その他</option>
+          <option>回答しない</option>
+        </select>
+
+      </div>
+
+
+      <button
+        class="btn btn-primary"
+        onclick="createParticipant()"
+      >
+        ビンゴスタート！
+      </button>
+
+
+      <button
+        class="btn btn-secondary"
+        onclick="showPage('pageTop')"
+      >
+        戻る
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ========================================
+     BINGO
+========================================= -->
+<section id="pageBingo" class="page">
+
+  <div class="container">
+
+    <div class="card">
+
+      <div class="bingo-head">
+
+        <div>
+          さんかしゃNO
+        </div>
+
+        <div
+          id="participantNo"
+          class="participant-no"
+        >
+          ----
+        </div>
+
+
+        <div
+          id="bingoCount"
+          class="bingo-count"
+        >
+          0 / 3 BINGO
+        </div>
+
+      </div>
+
+
+      <div
+        id="bingoGrid"
+        class="bingo-grid"
+      ></div>
+
+
+      <div
+        id="unlockMessage"
+        class="unlock locked"
+      >
+        3BINGOでガチャにチャレンジ！
+      </div>
+
+
+      <button
+        id="returnQuizButton"
+        class="btn btn-secondary"
+        style="display:none"
+        onclick="returnToQuiz()"
+      >
+        問題へ戻る
+      </button>
+
+
+      <button
+        class="btn btn-primary"
+        onclick="openScanner()"
+      >
+        QRカメラ
+      </button>
+
+
+      <button
+        id="gachaButton"
+        class="btn btn-gacha"
+        style="display:none"
+        onclick="openGacha()"
+      >
+        ガチャにチャレンジ！
+      </button>
+
+
+      <div class="small-info">
+        正解した番号のマスが開きます
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ========================================
+     QR CAMERA
+========================================= -->
+<section id="pageScanner" class="page">
+
+  <div class="container">
+
+    <div class="card">
+
+      <h1 class="title">
+        QRを読み取ろう
+      </h1>
+
+      <p class="sub">
+        院内にあるクイズQRをカメラに映してね。
+      </p>
+
+
+      <div id="reader"></div>
+
+
+      <div class="manual-box">
+
+        <div class="sub">
+          カメラが使えない場合
+        </div>
+
+        <div class="manual-row">
+
+          <input
+            id="manualQuizNo"
+            type="number"
+            min="1"
+            max="25"
+            placeholder="問題NO"
+          >
+
+          <button
+            class="btn btn-secondary"
+            style="margin:0;width:auto"
+            onclick="manualQuizOpen()"
+          >
+            開く
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="btn btn-secondary"
+        onclick="closeScanner()"
+      >
+        ビンゴカードへ戻る
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ========================================
+     QUIZ
+========================================= -->
+<section id="pageQuiz" class="page">
+
+  <div class="container">
+
+    <div class="card">
+
+      <div
+        id="quizNumber"
+        class="quiz-no"
+      >
+        QUESTION 1
+      </div>
+
+
+      <img
+        id="quizImage"
+        class="quiz-image"
+        alt="問題画像"
+      >
+
+
+      <div
+        id="quizQuestion"
+        class="quiz-question"
+      ></div>
+
+
+      <div id="choices"></div>
+
+
+      <div
+        id="quizMessage"
+        class="quiz-message"
+      ></div>
+
+
+      <button
+        class="btn btn-secondary"
+        onclick="inspectBingoFromQuiz()"
+      >
+        ビンゴカードを確認
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ========================================
+     GACHA
+========================================= -->
+<section id="pageGacha" class="page">
+
+  <div id="gachaStart" class="container">
+
+    <div class="card">
+
+      <h1 class="title">
+        3BINGO達成！
+      </h1>
+
+      <p class="sub" style="text-align:center">
+        ガチャにチャレンジしよう！
+      </p>
+
+
+      <button
+        id="drawButton"
+        class="btn btn-gacha"
+        onclick="playGacha()"
+      >
+        ガチャをひく
+      </button>
+
+
+      <button
+        class="btn btn-secondary"
+        onclick="showBingo()"
+      >
+        ビンゴカードへ戻る
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <video
+    id="gachaVideo"
+    class="gacha-video"
+    playsinline
+    preload="auto"
+    style="display:none"
+  >
+    <source
+      src="y.mp4"
+      type="video/mp4"
+    >
+  </video>
+
+
+  <div
+    id="gachaResult"
+    class="gacha-result"
+  >
+
+    <img
+      id="prizeImage"
+      src=""
+      alt="当選結果"
+    >
+
+
+    <div class="container">
+
+      <div
+        id="prizeTitle"
+        class="gacha-result-title"
+      ></div>
+
+
+      <div id="redeemArea">
+
+        <p class="sub">
+          この画面をスタッフに見せてください。<br>
+          景品交換ボタンはスタッフが操作してください。
+        </p>
+
+        <button
+          class="btn btn-primary"
+          onclick="redeemPrize()"
+        >
+          景品交換
+        </button>
+
+      </div>
+
+
+      <div
+        id="redeemedLabel"
+        class="redeemed"
+        style="display:none"
+      >
+        景品交換済み
+      </div>
+
+
+      <button
+        id="demoAgainButton"
+        class="btn btn-secondary"
+        style="display:none"
+        onclick="demoDrawAgain()"
+      >
+        テストでもう一度ひく
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<script>
+
+const GAS_URL =
+  'https://script.google.com/macros/s/AKfycbwFfH_EE3gXJ5HwNqNjt8vaZzIyQ7Ah1fE6-YVXjlbhuUnjs42Hvs0bmRiRBtXPTU4f/exec';
+
+const STORAGE_KEY =
+  'masubuchi_bingo_participant';
+
+let participantState = null;
+let currentQuizNo = null;
+let inspectReturnQuizNo = null;
+let qrScanner = null;
+
+let appConfig = {
+  demoMode:true,
+  requiredBingo:3
+};
+
+
+function showPage(id){
+
+  document
+    .querySelectorAll('.page')
+    .forEach(
+      el =>
+        el.classList.remove(
+          'active'
+        )
+    );
+
+  const page =
+    document.getElementById(id);
+
+  if(page){
+    page.classList.add('active');
+  }
+
+  window.scrollTo(0,0);
+}
+
+
+function setLoading(show){
+
+  document
+    .getElementById(
+      'loading'
+    )
+    .classList.toggle(
+      'show',
+      !!show
+    );
+}
+
+
+function showRealTop(){
+
+  document
+    .getElementById(
+      'topImage'
+    )
+    .style.display =
+      'block';
+
+  document
+    .getElementById(
+      'topDummy'
+    )
+    .style.display =
+      'none';
+}
+
+
+function showDummyTop(){
+
+  document
+    .getElementById(
+      'topImage'
+    )
+    .style.display =
+      'none';
+
+  document
+    .getElementById(
+      'topDummy'
+    )
+    .style.display =
+      'flex';
+}
+
+
+function api(action, params = {}){
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const callback =
+        'cb_' +
+        Date.now() +
+        '_' +
+        Math.floor(
+          Math.random() * 100000
+        );
+
+
+      const query =
+        new URLSearchParams({
+          action,
+          ...params,
+          callback,
+          _:
+            Date.now()
+        });
+
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+
+      const timer =
+        setTimeout(() => {
+
+          cleanup();
+
+          reject(
+            new Error(
+              '通信がタイムアウトしました'
+            )
+          );
+
+        },20000);
+
+
+      function cleanup(){
+
+        clearTimeout(timer);
+
+        try{
+          delete window[
+            callback
+          ];
+        }catch(e){}
+
+        if(
+          script.parentNode
+        ){
+          script.parentNode
+            .removeChild(
+              script
+            );
+        }
+      }
+
+
+      window[
+        callback
+      ] = data => {
+
+        cleanup();
+
+        resolve(data);
+      };
+
+
+      script.onerror =
+        () => {
+
+          cleanup();
+
+          reject(
+            new Error(
+              '通信に失敗しました'
+            )
+          );
+        };
+
+
+      script.src =
+        GAS_URL +
+        '?' +
+        query.toString();
+
+
+      document.body.appendChild(
+        script
+      );
+    }
+  );
+}
+
+
+function saveLocalParticipant(
+  participantNo
+){
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    participantNo
+  );
+}
+
+
+function getLocalParticipant(){
+
+  return localStorage.getItem(
+    STORAGE_KEY
+  );
+}
+
+
+function clearLocalParticipant(){
+
+  localStorage.removeItem(
+    STORAGE_KEY
+  );
+
+  participantState = null;
+}
+
+
+async function loadConfig(){
+
+  try{
+
+    const result =
+      await api(
+        'getConfig'
+      );
+
+
+    if(
+      result &&
+      result.ok
+    ){
+
+      appConfig =
+        result;
+
+
+      const box =
+        document.getElementById(
+          'eventMessage'
+        );
+
+
+      if(
+        result.demoMode
+      ){
+
+        box.innerHTML =
+          '<div class="system-message">' +
+          '現在はテストモードです' +
+          '</div>';
+
+      }else if(
+        result.eventStatus &&
+        !result.eventStatus.open
+      ){
+
+        box.innerHTML =
+          '<div class="system-message">' +
+          escapeHtml(
+            result.eventStatus.message
+          ) +
+          '</div>';
+      }
+    }
+
+  }catch(error){
+
+    console.error(error);
+  }
+}
+
+
+async function createParticipant(){
+
+  const age =
+    document
+      .getElementById(
+        'age'
+      )
+      .value;
+
+  const residence =
+    document
+      .getElementById(
+        'residence'
+      )
+      .value;
+
+  const gender =
+    document
+      .getElementById(
+        'gender'
+      )
+      .value;
+
+
+  if(
+    !age ||
+    !residence ||
+    !gender
+  ){
+
+    alert(
+      'すべて選んでください'
+    );
+
+    return;
+  }
+
+
+  setLoading(true);
+
+
+  try{
+
+    const result =
+      await api(
+        'createParticipant',
+        {
+          age,
+          residence,
+          gender
+        }
+      );
+
+
+    if(
+      !result.ok
+    ){
+
+      alert(
+        result.message ||
+        '参加者登録に失敗しました'
+      );
+
+      return;
+    }
+
+
+    participantState =
+      result;
+
+
+    saveLocalParticipant(
+      result.participantNo
+    );
+
+
+    inspectReturnQuizNo =
+      null;
+
+
+    renderBingo();
+
+    showPage(
+      'pageBingo'
+    );
+
+
+  }catch(error){
+
+    alert(
+      error.message
+    );
+
+  }finally{
+
+    setLoading(false);
+  }
+}
+
+
+async function restoreParticipant(
+  participantNo,
+  silent = false
+){
+
+  if(
+    !participantNo
+  ){
+    return false;
+  }
+
+
+  try{
+
+    const result =
+      await api(
+        'getParticipant',
+        {
+          participantNo
+        }
+      );
+
+
+    if(
+      !result.ok
+    ){
+
+      clearLocalParticipant();
+
+      document
+        .getElementById(
+          'continueButton'
+        )
+        .style.display =
+          'none';
+
+
+      if(!silent){
+
+        alert(
+          result.message ||
+          '参加者NOが見つかりません'
+        );
+      }
+
+
+      return false;
+    }
+
+
+    participantState =
+      result;
+
+
+    saveLocalParticipant(
+      participantNo
+    );
+
+
+    document
+      .getElementById(
+        'continueButton'
+      )
+      .style.display =
+        'block';
+
+
+    return true;
+
+
+  }catch(error){
+
+    if(!silent){
+
+      alert(
+        error.message
+      );
+    }
+
+    return false;
+  }
+}
+
+
+async function restoreByNumber(){
+
+  const no =
+    document
+      .getElementById(
+        'restoreNo'
+      )
+      .value
+      .trim();
+
+
+  if(
+    !/^\d{4}$/.test(no)
+  ){
+
+    alert(
+      '4けたの参加者NOを入力してください'
+    );
+
+    return;
+  }
+
+
+  setLoading(true);
+
+
+  const ok =
+    await restoreParticipant(
+      no
+    );
+
+
+  setLoading(false);
+
+
+  if(ok){
+
+    inspectReturnQuizNo =
+      null;
+
+    renderBingo();
+
+    showPage(
+      'pageBingo'
+    );
+  }
+}
+
+
+async function continueGame(){
+
+  const no =
+    getLocalParticipant();
+
+
+  if(!no){
+    return;
+  }
+
+
+  setLoading(true);
+
+
+  const ok =
+    await restoreParticipant(
+      no
+    );
+
+
+  setLoading(false);
+
+
+  if(ok){
+
+    inspectReturnQuizNo =
+      null;
+
+    renderBingo();
+
+    showPage(
+      'pageBingo'
+    );
+  }
+}
+
+
+function renderBingo(){
+
+  if(
+    !participantState
+  ){
+    return;
+  }
+
+
+  const no =
+    participantState
+      .participantNo;
+
+
+  document
+    .getElementById(
+      'participantNo'
+    )
+    .textContent =
+      no;
+
+
+  const bingoCount =
+    Number(
+      participantState
+        .bingoCount ||
+      0
+    );
+
+
+  document
+    .getElementById(
+      'bingoCount'
+    )
+    .textContent =
+      bingoCount +
+      ' / ' +
+      appConfig.requiredBingo +
+      ' BINGO';
+
+
+  const grid =
+    document
+      .getElementById(
+        'bingoGrid'
+      );
+
+
+  grid.innerHTML =
+    '';
+
+
+  const cleared =
+    new Set(
+      (
+        participantState
+          .cleared ||
+        []
+      )
+      .map(Number)
+    );
+
+
+  (
+    participantState
+      .bingoLayout ||
+    []
+  )
+  .forEach(
+    number => {
+
+      const cell =
+        document
+          .createElement(
+            'div'
+          );
+
+
+      cell.className =
+        'bingo-cell';
+
+
+      if(
+        cleared.has(
+          Number(number)
+        )
+      ){
+
+        cell.classList.add(
+          'open'
+        );
+      }
+
+
+      cell.textContent =
+        number;
+
+
+      grid.appendChild(
+        cell
+      );
+    }
+  );
+
+
+  const unlocked =
+    bingoCount >=
+    appConfig.requiredBingo;
+
+
+  const message =
+    document
+      .getElementById(
+        'unlockMessage'
+      );
+
+
+  const gachaButton =
+    document
+      .getElementById(
+        'gachaButton'
+      );
+
+
+  if(unlocked){
+
+    message.className =
+      'unlock open';
+
+    message.textContent =
+      '3BINGO達成！ガチャにチャレンジできます！';
+
+    gachaButton
+      .style.display =
+        'block';
+
+  }else{
+
+    message.className =
+      'unlock locked';
+
+    message.textContent =
+      '3BINGOでガチャにチャレンジ！';
+
+    gachaButton
+      .style.display =
+        'none';
+  }
+
+
+  const returnButton =
+    document
+      .getElementById(
+        'returnQuizButton'
+      );
+
+
+  returnButton
+    .style.display =
+      inspectReturnQuizNo
+        ? 'block'
+        : 'none';
+}
+
+
+function showBingo(){
+
+  inspectReturnQuizNo =
+    null;
+
+  renderBingo();
+
+  showPage(
+    'pageBingo'
+  );
+}
+
+
+async function openScanner(){
+
+  inspectReturnQuizNo =
+    null;
+
+
+  showPage(
+    'pageScanner'
+  );
+
+
+  await startScanner();
+}
+
+
+async function startScanner(){
+
+  if(
+    typeof Html5Qrcode ===
+    'undefined'
+  ){
+
+    alert(
+      'カメラ機能を読み込めませんでした。問題NOを入力してください。'
+    );
+
+    return;
+  }
+
+
+  try{
+
+    if(qrScanner){
+
+      try{
+        await qrScanner.stop();
+      }catch(e){}
+
+      try{
+        await qrScanner.clear();
+      }catch(e){}
+    }
+
+
+    qrScanner =
+      new Html5Qrcode(
+        'reader'
+      );
+
+
+    await qrScanner.start(
+
+      {
+        facingMode:
+          'environment'
+      },
+
+      {
+        fps:10,
+
+        qrbox:{
+          width:250,
+          height:250
+        }
+      },
+
+      async decodedText => {
+
+        const quizNo =
+          extractQuizNo(
+            decodedText
+          );
+
+
+        if(!quizNo){
+          return;
+        }
+
+
+        await stopScanner();
+
+        await openQuiz(
+          quizNo
+        );
+      },
+
+      () => {}
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      'カメラを起動できませんでした。問題NOを入力してください。'
+    );
+  }
+}
+
+
+async function stopScanner(){
+
+  if(!qrScanner){
+    return;
+  }
+
+
+  try{
+    await qrScanner.stop();
+  }catch(e){}
+
+
+  try{
+    await qrScanner.clear();
+  }catch(e){}
+
+
+  qrScanner = null;
+}
+
+
+async function closeScanner(){
+
+  await stopScanner();
+
+  renderBingo();
+
+  showPage(
+    'pageBingo'
+  );
+}
+
+
+function extractQuizNo(
+  text
+){
+
+  if(!text){
+    return null;
+  }
+
+
+  try{
+
+    const url =
+      new URL(
+        text
+      );
+
+
+    const q =
+      Number(
+        url.searchParams.get(
+          'q'
+        )
+      );
+
+
+    if(
+      q >= 1 &&
+      q <= 25
+    ){
+
+      return q;
+    }
+
+  }catch(e){}
+
+
+  const number =
+    Number(
+      String(text)
+        .trim()
+    );
+
+
+  if(
+    number >= 1 &&
+    number <= 25
+  ){
+
+    return number;
+  }
+
+
+  const match =
+    String(text)
+      .match(
+        /(?:\?|&)q=(\d{1,2})/
+      );
+
+
+  if(match){
+
+    const q =
+      Number(
+        match[1]
+      );
+
+
+    if(
+      q >= 1 &&
+      q <= 25
+    ){
+
+      return q;
+    }
+  }
+
+
+  return null;
+}
+
+
+async function manualQuizOpen(){
+
+  const no =
+    Number(
+      document
+        .getElementById(
+          'manualQuizNo'
+        )
+        .value
+    );
+
+
+  if(
+    no < 1 ||
+    no > 25
+  ){
+
+    alert(
+      '1〜25を入力してください'
+    );
+
+    return;
+  }
+
+
+  await stopScanner();
+
+  await openQuiz(
+    no
+  );
+}
+
+
+async function openQuiz(
+  quizNo
+){
+
+  if(
+    !participantState
+  ){
+
+    alert(
+      '先にビンゴカードを発行してください'
+    );
+
+    showPage(
+      'pageTop'
+    );
+
+    return;
+  }
+
+
+  currentQuizNo =
+    Number(
+      quizNo
+    );
+
+
+  setLoading(true);
+
+
+  try{
+
+    const result =
+      await api(
+        'getQuiz',
+        {
+          quizNo:
+            currentQuizNo
+        }
+      );
+
+
+    if(
+      !result.ok
+    ){
+
+      alert(
+        result.message ||
+        '問題を読み込めませんでした'
+      );
+
+      return;
+    }
+
+
+    renderQuiz(
+      result
+    );
+
+
+    showPage(
+      'pageQuiz'
+    );
+
+
+  }catch(error){
+
+    alert(
+      error.message
+    );
+
+  }finally{
+
+    setLoading(false);
+  }
+}
+
+
+function renderQuiz(
+  quiz
+){
+
+  document
+    .getElementById(
+      'quizNumber'
+    )
+    .textContent =
+      'QUESTION ' +
+      quiz.no;
+
+
+  const question =
+    document
+      .getElementById(
+        'quizQuestion'
+      );
+
+
+  question.textContent =
+    quiz.question ||
+    '';
+
+
+  const image =
+    document
+      .getElementById(
+        'quizImage'
+      );
+
+
+  const type =
+    String(
+      quiz.displayType ||
+      'text'
+    )
+    .toLowerCase();
+
+
+  if(
+    (
+      type === 'image' ||
+      type === 'both'
+    ) &&
+    quiz.imageUrl
+  ){
+
+    image.src =
+      quiz.imageUrl;
+
+    image.style.display =
+      'block';
+
+  }else{
+
+    image.removeAttribute(
+      'src'
+    );
+
+    image.style.display =
+      'none';
+  }
+
+
+  if(
+    type === 'image' &&
+    !quiz.question
+  ){
+
+    question.style.display =
+      'none';
+
+  }else{
+
+    question.style.display =
+      'block';
+  }
+
+
+  const choices =
+    document
+      .getElementById(
+        'choices'
+      );
+
+
+  choices.innerHTML =
+    '';
+
+
+  [
+    'A',
+    'B',
+    'C',
+    'D'
+  ]
+  .forEach(
+    letter => {
+
+      const button =
+        document
+          .createElement(
+            'button'
+          );
+
+
+      button.className =
+        'choice';
+
+
+      const text =
+        quiz.choices[
+          letter
+        ] ||
+        letter;
+
+
+      button.innerHTML =
+        '<span class="choice-letter">' +
+        letter +
+        '</span>' +
+        '<span>' +
+        escapeHtml(text) +
+        '</span>';
+
+
+      button.onclick =
+        () =>
+          submitAnswer(
+            letter
+          );
+
+
+      choices.appendChild(
+        button
+      );
+    }
+  );
+
+
+  const message =
+    document
+      .getElementById(
+        'quizMessage'
+      );
+
+
+  message.className =
+    'quiz-message';
+
+  message.textContent =
+    '';
+}
+
+
+async function submitAnswer(
+  answer
+){
+
+  if(
+    !participantState ||
+    !currentQuizNo
+  ){
+    return;
+  }
+
+
+  setLoading(true);
+
+
+  try{
+
+    const result =
+      await api(
+        'answerQuiz',
+        {
+          participantNo:
+            participantState
+              .participantNo,
+
+          quizNo:
+            currentQuizNo,
+
+          answer:
+            answer
+        }
+      );
+
+
+    if(
+      !result.ok
+    ){
+
+      alert(
+        result.message ||
+        '回答を送信できませんでした'
+      );
+
+      return;
+    }
+
+
+    if(
+      !result.correct
+    ){
+
+      const message =
+        document
+          .getElementById(
+            'quizMessage'
+          );
+
+
+      message.className =
+        'quiz-message wrong';
+
+      message.textContent =
+        result.message ||
+        'ざんねん！';
+
+
+      return;
+    }
+
+
+    participantState =
+      result.state;
+
+
+    inspectReturnQuizNo =
+      null;
+
+
+    renderBingo();
+
+    showPage(
+      'pageBingo'
+    );
+
+
+  }catch(error){
+
+    alert(
+      error.message
+    );
+
+  }finally{
+
+    setLoading(false);
+  }
+}
+
+
+function inspectBingoFromQuiz(){
+
+  inspectReturnQuizNo =
+    currentQuizNo;
+
+  renderBingo();
+
+  showPage(
+    'pageBingo'
+  );
+}
+
+
+function returnToQuiz(){
+
+  const no =
+    inspectReturnQuizNo;
+
+
+  inspectReturnQuizNo =
+    null;
+
+
+  if(no){
+
+    openQuiz(
+      no
+    );
+  }
+}
+
+
+async function openGacha(){
+
+  if(
+    !participantState
+  ){
+    return;
+  }
+
+
+  setLoading(true);
+
+
+  try{
+
+    const result =
+      await api(
+        'canPlayGacha',
+        {
+          participantNo:
+            participantState
+              .participantNo
+        }
+      );
+
+
+    if(
+      !result.ok
+    ){
+
+      alert(
+        result.message
+      );
+
+      return;
+    }
+
+
+    if(
+      !result.canPlay &&
+      result.reason ===
+        'alreadyPlayed' &&
+      result.result
+    ){
+
+      showGachaResult(
+        result.result,
+        !!result.redeemed
+      );
+
+      showPage(
+        'pageGacha'
+      );
+
+      return;
+    }
+
+
+    if(
+      !result.canPlay
+    ){
+
+      alert(
+        result.message
+      );
+
+      return;
+    }
+
+
+    resetGachaView();
+
+    showPage(
+      'pageGacha'
+    );
+
+
+  }catch(error){
+
+    alert(
+      error.message
+    );
+
+  }finally{
+
+    setLoading(false);
+  }
+}
+
+
+function resetGachaView(){
+
+  document
+    .getElementById(
+      'gachaStart'
+    )
+    .style.display =
+      'block';
+
+
+  document
+    .getElementById(
+      'gachaVideo'
+    )
+    .style.display =
+      'none';
+
+
+  document
+    .getElementById(
+      'gachaResult'
+    )
+    .style.display =
+      'none';
+
+
+  document
+    .getElementById(
+      'redeemArea'
+    )
+    .style.display =
+      'block';
+
+
+  document
+    .getElementById(
+      'redeemedLabel'
+    )
+    .style.display =
+      'none';
+
+
+  document
+    .getElementById(
+      'demoAgainButton'
+    )
+    .style.display =
+      'none';
+}
+
+
+async function playGacha(){
+
+  if(
+    !participantState
+  ){
+    return;
+  }
+
+
+  const button =
+    document
+      .getElementById(
+        'drawButton'
+      );
+
+
+  button.disabled =
+    true;
+
+
+  setLoading(true);
+
+
+  try{
+
+    const result =
+      await api(
+        'playGacha',
+        {
+          participantNo:
+            participantState
+              .participantNo
+        }
+      );
+
+
+    if(
+      !result.ok
+    ){
+
+      alert(
+        result.message
+      );
+
+      button.disabled =
+        false;
+
+      return;
+    }
+
+
+    setLoading(false);
+
+
+    if(
+      result.alreadyPlayed
+    ){
+
+      showGachaResult(
+        result.result,
+        !!result.redeemed
+      );
+
+      return;
+    }
+
+
+    await playGachaMovie();
+
+
+    showGachaResult(
+      result.result,
+      false
+    );
+
+
+    await restoreParticipant(
+      participantState
+        .participantNo,
+      true
+    );
+
+
+  }catch(error){
+
+    setLoading(false);
+
+    alert(
+      error.message
+    );
+
+    button.disabled =
+      false;
+  }
+}
+
+
+function playGachaMovie(){
+
+  return new Promise(
+    resolve => {
+
+      const start =
+        document
+          .getElementById(
+            'gachaStart'
+          );
+
+
+      const video =
+        document
+          .getElementById(
+            'gachaVideo'
+          );
+
+
+      start.style.display =
+        'none';
+
+
+      video.style.display =
+        'block';
+
+
+      video.currentTime =
+        0;
+
+
+      let finished =
+        false;
+
+
+      const done =
+        () => {
+
+          if(finished){
+            return;
+          }
+
+          finished =
+            true;
+
+          video.pause();
+
+          video.style.display =
+            'none';
+
+          resolve();
+        };
+
+
+      video.onended =
+        done;
+
+
+      const timer =
+        setTimeout(
+          done,
+          20000
+        );
+
+
+      video.addEventListener(
+        'ended',
+        () =>
+          clearTimeout(
+            timer
+          ),
+        {
+          once:true
+        }
+      );
+
+
+      const promise =
+        video.play();
+
+
+      if(
+        promise &&
+        typeof promise.catch ===
+          'function'
+      ){
+
+        promise.catch(
+          () => {
+
+            clearTimeout(
+              timer
+            );
+
+            done();
+          }
+        );
+      }
+    }
+  );
+}
+
+
+function showGachaResult(
+  result,
+  redeemed
+){
+
+  if(!result){
+    return;
+  }
+
+
+  document
+    .getElementById(
+      'gachaStart'
+    )
+    .style.display =
+      'none';
+
+
+  document
+    .getElementById(
+      'gachaVideo'
+    )
+    .style.display =
+      'none';
+
+
+  const resultBox =
+    document
+      .getElementById(
+        'gachaResult'
+      );
+
+
+  resultBox.style.display =
+    'block';
+
+
+  const image =
+    document
+      .getElementById(
+        'prizeImage'
+      );
+
+
+  image.src =
+    result.image ||
+    '';
+
+
+  document
+    .getElementById(
+      'prizeTitle'
+    )
+    .textContent =
+      (
+        result.rank ||
+        ''
+      ) +
+      (
+        result.prizeName
+          ? '　' +
+            result.prizeName
+          : ''
+      );
+
+
+  if(redeemed){
+
+    document
+      .getElementById(
+        'redeemArea'
+      )
+      .style.display =
+        'none';
+
+
+    document
+      .getElementById(
+        'redeemedLabel'
+      )
+      .style.display =
+        'block';
+
+  }else{
+
+    document
+      .getElementById(
+        'redeemArea'
+      )
+      .style.display =
+        'block';
+
+
+    document
+      .getElementById(
+        'redeemedLabel'
+      )
+      .style.display =
+        'none';
+  }
+
+
+  document
+    .getElementById(
+      'demoAgainButton'
+    )
+    .style.display =
+      appConfig.demoMode
+        ? 'block'
+        : 'none';
+
+
+  window.scrollTo(
+    0,
+    0
+  );
+}
+
+
+async function redeemPrize(){
+
+  if(
+    !participantState
+  ){
+    return;
+  }
+
+
+  if(
+    !confirm(
+      'スタッフ操作です。\n景品交換済みにしますか？'
+    )
+  ){
+    return;
+  }
+
+
+  setLoading(true);
+
+
+  try{
+
+    const result =
+      await api(
+        'redeemGacha',
+        {
+          participantNo:
+            participantState
+              .participantNo
+        }
+      );
+
+
+    if(
+      !result.ok
+    ){
+
+      alert(
+        result.message
+      );
+
+      return;
+    }
+
+
+    document
+      .getElementById(
+        'redeemArea'
+      )
+      .style.display =
+        'none';
+
+
+    document
+      .getElementById(
+        'redeemedLabel'
+      )
+      .style.display =
+        'block';
+
+
+    await restoreParticipant(
+      participantState
+        .participantNo,
+      true
+    );
+
+
+  }catch(error){
+
+    alert(
+      error.message
+    );
+
+  }finally{
+
+    setLoading(false);
+  }
+}
+
+
+function demoDrawAgain(){
+
+  if(
+    !appConfig.demoMode
+  ){
+    return;
+  }
+
+
+  resetGachaView();
+}
+
+
+function getQueryQuizNo(){
+
+  const params =
+    new URLSearchParams(
+      location.search
+    );
+
+
+  const q =
+    Number(
+      params.get(
+        'q'
+      )
+    );
+
+
+  if(
+    q >= 1 &&
+    q <= 25
+  ){
+
+    return q;
+  }
+
+
+  return null;
+}
+
+
+function escapeHtml(
+  value
+){
+
+  return String(
+    value ?? ''
+  )
+  .replace(
+    /&/g,
+    '&amp;'
+  )
+  .replace(
+    /</g,
+    '&lt;'
+  )
+  .replace(
+    />/g,
+    '&gt;'
+  )
+  .replace(
+    /"/g,
+    '&quot;'
+  )
+  .replace(
+    /'/g,
+    '&#039;'
+  );
+}
+
+
+async function boot(){
+
+  await loadConfig();
+
+
+  const localNo =
+    getLocalParticipant();
+
+
+  if(localNo){
+
+    const ok =
+      await restoreParticipant(
+        localNo,
+        true
+      );
+
+
+    if(ok){
+
+      document
+        .getElementById(
+          'continueButton'
+        )
+        .style.display =
+          'block';
+    }
+  }
+
+
+  const q =
+    getQueryQuizNo();
+
+
+  if(q){
+
+    if(
+      participantState
+    ){
+
+      openQuiz(
+        q
+      );
+
+    }else{
+
+      showPage(
+        'pageTop'
+      );
+
+      alert(
+        'まずビンゴカードを発行してください'
+      );
+    }
+  }
+}
+
+
+window.addEventListener(
+  'DOMContentLoaded',
+  boot
+);
+
+</script>
+
+</body>
+</html>
