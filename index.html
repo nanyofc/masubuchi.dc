@@ -560,9 +560,9 @@ button{
 
 
     <div class="notice">
-      <b>さんかしゃNOについて</b><br>
+      <b>参加者NOについて</b><br>
       ビンゴカードをつくると、
-      4けたの「さんかしゃNO」が
+      4けたの「参加者NO」が
       ビンゴカードに表示されます。<br>
       とちゅうで画面をとじたときに、
       つづきからあそぶために使います。
@@ -716,7 +716,7 @@ button{
       <div class="bingo-head">
 
         <div>
-          さんかしゃNO
+          参加者NO
         </div>
 
         <div
@@ -811,32 +811,8 @@ button{
       <div id="reader"></div>
 
 
-      <div class="manual-box">
-
-        <div class="sub">
-          カメラが使えない場合
-        </div>
-
-        <div class="manual-row">
-
-          <input
-            id="manualQuizNo"
-            type="number"
-            min="1"
-            max="25"
-            placeholder="問題NO"
-          >
-
-          <button
-            class="btn btn-secondary"
-            style="margin:0;width:auto"
-            onclick="manualQuizOpen()"
-          >
-            開く
-          </button>
-
-        </div>
-
+      <div class="notice">
+        カメラが使えない場合は、スタッフに声をかけてください。
       </div>
 
 
@@ -1958,39 +1934,6 @@ function extractQuizNo(
 
 
   return null;
-}
-
-
-async function manualQuizOpen(){
-
-  const no =
-    Number(
-      document
-        .getElementById(
-          'manualQuizNo'
-        )
-        .value
-    );
-
-
-  if(
-    no < 1 ||
-    no > 25
-  ){
-
-    alert(
-      '1〜25を入力してください'
-    );
-
-    return;
-  }
-
-
-  await stopScanner();
-
-  await openQuiz(
-    no
-  );
 }
 
 
