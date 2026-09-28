@@ -545,6 +545,7 @@ button{
     <button
       id="issueButton"
       class="btn btn-primary"
+      style="display:none"
       onclick="showPage('pageProfile')"
     >
       ビンゴカードを発行する
@@ -999,6 +1000,9 @@ const GAS_URL =
 const STORAGE_KEY =
   'masubuchi_bingo_participant';
 
+const DEVICE_KEY =
+  'masubuchi_bingo_device_id';
+
 let participantState = null;
 let currentQuizNo = null;
 let inspectReturnQuizNo = null;
@@ -1202,6 +1206,50 @@ function getLocalParticipant(){
 }
 
 
+function getOrCreateDeviceId(){
+
+  let deviceId =
+    localStorage.getItem(
+      DEVICE_KEY
+    );
+
+
+  if(deviceId){
+    return deviceId;
+  }
+
+
+  if(
+    window.crypto &&
+    typeof window.crypto.randomUUID ===
+      'function'
+  ){
+
+    deviceId =
+      window.crypto.randomUUID();
+
+  }else{
+
+    deviceId =
+      'dev_' +
+      Date.now() +
+      '_' +
+      Math.random()
+        .toString(36)
+        .slice(2,12);
+  }
+
+
+  localStorage.setItem(
+    DEVICE_KEY,
+    deviceId
+  );
+
+
+  return deviceId;
+}
+
+
 function clearLocalParticipant(){
 
   localStorage.removeItem(
@@ -1295,6 +1343,49 @@ async function loadConfig(){
 
 async function createParticipant(){
 
+  /*
+   * 二重発行防止：
+   * 端末に既存の参加者NOがある場合は、
+   * 新しいNOを作らず既存カードへ戻す。
+   */
+  const localNo =
+    getLocalParticipant();
+
+
+  if(localNo){
+
+    setLoading(true);
+
+    try{
+
+      const restored =
+        await restoreParticipant(
+          localNo,
+          true
+        );
+
+
+      if(restored){
+
+        inspectReturnQuizNo =
+          null;
+
+        renderBingo();
+
+        showPage(
+          'pageBingo'
+        );
+
+        return;
+      }
+
+    }finally{
+
+      setLoading(false);
+    }
+  }
+
+
   const age =
     document
       .getElementById(
@@ -1342,7 +1433,9 @@ async function createParticipant(){
         {
           age,
           residence,
-          gender
+          gender,
+          deviceId:
+            getOrCreateDeviceId()
         }
       );
 
@@ -1416,7 +1509,9 @@ async function restoreParticipant(
       await api(
         'getParticipant',
         {
-          participantNo
+          participantNo,
+          deviceId:
+            getOrCreateDeviceId()
         }
       );
 
@@ -2906,24 +3001,31 @@ function escapeHtml(
 
 async function boot(){
 
-  await loadConfig();
+  const deviceId =
+    getOrCreateDeviceId();
 
 
   const localNo =
     getLocalParticipant();
 
 
+  /*
+   * 初期表示のチラつき防止：
+   * HTML側では新規発行ボタンを最初から隠している。
+   * 既存NOがある端末だけ「つづきから」を先に表示する。
+   */
   if(localNo){
 
-    /*
-     * 端末に参加者NOが残っている間は、
-     * 復元確認が終わる前から新規発行を隠す。
-     * 通信エラー時の重複発行も防ぐ。
-     */
     setExistingParticipantUI(
       true
     );
+  }
 
+
+  await loadConfig();
+
+
+  if(localNo){
 
     await restoreParticipant(
       localNo,
@@ -2932,9 +3034,86 @@ async function boot(){
 
   }else{
 
-    setExistingParticipantUI(
-      false
-    );
+    /*
+     * 参加者NOの保存が消えていても、
+     * 同じブラウザの端末IDが残っていれば既存カードを復元する。
+     */
+    try{
+
+      const result =
+        await api(
+          'getParticipantByDevice',
+          {
+            deviceId
+          }
+        );
+
+
+      if(
+        result &&
+        result.ok &&
+        result.found &&
+        result.participantNo
+      ){
+
+        participantState =
+          result;
+
+        saveLocalParticipant(
+          result.participantNo
+        );
+
+        setExistingParticipantUI(
+          true
+        );
+
+      }else{
+
+        setExistingParticipantUI(
+          false
+        );
+      }
+
+    }catch(error){
+
+      console.error(error);
+
+      /*
+       * 通信エラー時は新規発行を開放しない。
+       * 誤って2枚目を発行するより安全側に倒す。
+       */
+      const issueButton =
+        document.getElementById(
+          'issueButton'
+        );
+
+      const continueButton =
+        document.getElementById(
+          'continueButton'
+        );
+
+      if(issueButton){
+        issueButton.style.display =
+          'none';
+      }
+
+      if(continueButton){
+        continueButton.style.display =
+          'none';
+      }
+
+      const box =
+        document.getElementById(
+          'eventMessage'
+        );
+
+      if(box){
+        box.innerHTML =
+          '<div class="system-message">' +
+          '通信を確認できませんでした。再読み込みしてください。' +
+          '</div>';
+      }
+    }
   }
 
 
@@ -2964,6 +3143,7 @@ async function boot(){
     }
   }
 }
+
 
 
 window.addEventListener(
