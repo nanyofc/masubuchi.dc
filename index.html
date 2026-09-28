@@ -983,14 +983,6 @@ button{
       </div>
 
 
-      <button
-        id="demoAgainButton"
-        class="btn btn-secondary"
-        style="display:none"
-        onclick="demoDrawAgain()"
-      >
-        テストでもう一度ひく
-      </button>
 
     </div>
 
@@ -1700,7 +1692,7 @@ function renderBingo(){
       'unlock open';
 
     message.textContent =
-      '3列BINGO達成！<br>ガチャにチャレンジできます！';
+      '3列BINGO達成！ ガチャにチャレンジできます！';
 
     gachaButton
       .style.display =
@@ -1712,7 +1704,7 @@ function renderBingo(){
       'unlock locked';
 
     message.textContent =
-      '3列BINGO達成で<br>ガチャにチャレンジできます';
+      '3列BINGO達成で ガチャにチャレンジできます';
 
     gachaButton
       .style.display =
@@ -2457,12 +2449,6 @@ function resetGachaView(){
       'none';
 
 
-  document
-    .getElementById(
-      'demoAgainButton'
-    )
-    .style.display =
-      'none';
 }
 
 
@@ -2768,14 +2754,6 @@ function showGachaResult(
   }
 
 
-  document
-    .getElementById(
-      'demoAgainButton'
-    )
-    .style.display =
-      appConfig.demoMode
-        ? 'block'
-        : 'none';
 
 
   window.scrollTo(
@@ -2864,19 +2842,6 @@ async function redeemPrize(){
 
     setLoading(false);
   }
-}
-
-
-function demoDrawAgain(){
-
-  if(
-    !appConfig.demoMode
-  ){
-    return;
-  }
-
-
-  resetGachaView();
 }
 
 
