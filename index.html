@@ -747,7 +747,7 @@ button{
         id="unlockMessage"
         class="unlock locked"
       >
-        3BINGOでガチャにチャレンジ！
+        3列BINGO達成で<br>ガチャにチャレンジできます
       </div>
 
 
@@ -893,7 +893,7 @@ button{
     <div class="card">
 
       <h1 class="title">
-        3BINGO達成！
+        3列BINGO達成！
       </h1>
 
       <p class="sub" style="text-align:center">
@@ -1245,15 +1245,7 @@ async function loadConfig(){
 
 
       if(
-        result.demoMode
-      ){
-
-        box.innerHTML =
-          '<div class="system-message">' +
-          '現在はテストモードです' +
-          '</div>';
-
-      }else if(
+        !result.demoMode &&
         result.eventStatus &&
         !result.eventStatus.open
       ){
@@ -1674,7 +1666,7 @@ function renderBingo(){
       'unlock open';
 
     message.textContent =
-      '3BINGO達成！ガチャにチャレンジできます！';
+      '3列BINGO達成！<br>ガチャにチャレンジできます！';
 
     gachaButton
       .style.display =
@@ -1686,7 +1678,7 @@ function renderBingo(){
       'unlock locked';
 
     message.textContent =
-      '3BINGOでガチャにチャレンジ！';
+      '3列BINGO達成で<br>ガチャにチャレンジできます';
 
     gachaButton
       .style.display =
