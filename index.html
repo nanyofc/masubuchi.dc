@@ -543,6 +543,7 @@ button{
     <div id="eventMessage"></div>
 
     <button
+      id="issueButton"
       class="btn btn-primary"
       onclick="showPage('pageProfile')"
     >
@@ -1219,6 +1220,40 @@ function clearLocalParticipant(){
 }
 
 
+function setExistingParticipantUI(
+  hasExisting
+){
+
+  const issueButton =
+    document.getElementById(
+      'issueButton'
+    );
+
+  const continueButton =
+    document.getElementById(
+      'continueButton'
+    );
+
+
+  if(issueButton){
+
+    issueButton.style.display =
+      hasExisting
+        ? 'none'
+        : 'block';
+  }
+
+
+  if(continueButton){
+
+    continueButton.style.display =
+      hasExisting
+        ? 'block'
+        : 'none';
+  }
+}
+
+
 async function loadConfig(){
 
   try{
@@ -1342,6 +1377,11 @@ async function createParticipant(){
     );
 
 
+    setExistingParticipantUI(
+      true
+    );
+
+
     inspectReturnQuizNo =
       null;
 
@@ -1395,12 +1435,9 @@ async function restoreParticipant(
 
       clearLocalParticipant();
 
-      document
-        .getElementById(
-          'continueButton'
-        )
-        .style.display =
-          'none';
+      setExistingParticipantUI(
+        false
+      );
 
 
       if(!silent){
@@ -1425,12 +1462,9 @@ async function restoreParticipant(
     );
 
 
-    document
-      .getElementById(
-        'continueButton'
-      )
-      .style.display =
-        'block';
+    setExistingParticipantUI(
+      true
+    );
 
 
     return true;
@@ -2916,22 +2950,26 @@ async function boot(){
 
   if(localNo){
 
-    const ok =
-      await restoreParticipant(
-        localNo,
-        true
-      );
+    /*
+     * 端末に参加者NOが残っている間は、
+     * 復元確認が終わる前から新規発行を隠す。
+     * 通信エラー時の重複発行も防ぐ。
+     */
+    setExistingParticipantUI(
+      true
+    );
 
 
-    if(ok){
+    await restoreParticipant(
+      localNo,
+      true
+    );
 
-      document
-        .getElementById(
-          'continueButton'
-        )
-        .style.display =
-          'block';
-    }
+  }else{
+
+    setExistingParticipantUI(
+      false
+    );
   }
 
 
