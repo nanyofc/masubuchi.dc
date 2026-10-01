@@ -174,7 +174,7 @@ button{
   z-index:2;
   left:5.2%;
   right:5.2%;
-  top:36.8%;
+  top:42.5%;
   bottom:3.2%;
   display:flex;
   flex-direction:column;
@@ -186,6 +186,17 @@ button{
 
 #eventMessage:empty{
   display:none;
+}
+
+.scroll-hint{
+  margin:0 0 2px;
+  text-align:center;
+  color:#8a6b26;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(13px,3.8vw,17px);
+  font-weight:700;
+  letter-spacing:.08em;
+  text-shadow:0 1px 0 rgba(255,255,255,.85);
 }
 
 .top-guide{
@@ -321,7 +332,7 @@ button{
 
 @media(max-width:380px){
   .top-actions{
-    top:36.5%;
+    top:42.2%;
     gap:8px;
   }
 
@@ -639,6 +650,8 @@ button{
 
       <div id="eventMessage"></div>
 
+      <div class="scroll-hint">Scroll ↓</div>
+
       <div class="top-guide">
 
         <p>
@@ -690,6 +703,8 @@ button{
         <b>参加者No.について</b>
         ゲーム開始時に、参加者ごとの「参加者No.」が発行されます。<br>
         参加者No.はビンゴカード画面にも表示されます。<br>
+        途中から再開するときに必要になるため、<strong>参加者No.は忘れないようにしてください。</strong><br>
+        スクリーンショットやメモで保存しておくと安心です。<br>
         途中で画面を閉じた場合や、画面が消えてしまった場合は、TOP画面で参加者No.を入力すると続きから再開できます。
       </div>
 
