@@ -409,6 +409,32 @@ button{
    BINGO
 ========================= */
 
+/* ビンゴ画面専用背景 */
+#pageBingo{
+  min-height:100vh;
+  background:
+    url("bin.png?v=20261001-1")
+    center top / cover
+    no-repeat;
+}
+
+#pageBingo .container{
+  padding-top:28px;
+  padding-left:18px;
+  padding-right:18px;
+  padding-bottom:44px;
+}
+
+#pageBingo .card{
+  background:rgba(255,255,255,.91);
+  border:1.5px solid rgba(211,170,67,.55);
+  box-shadow:
+    0 10px 30px rgba(21,59,119,.13),
+    inset 0 1px 0 rgba(255,255,255,.75);
+  backdrop-filter:blur(1.5px);
+  -webkit-backdrop-filter:blur(1.5px);
+}
+
 .bingo-head{
   text-align:center;
 }
@@ -672,7 +698,7 @@ button{
     <div class="top-image-wrap">
       <img
         id="topImage"
-        src="top.png?v=20261001-2"
+        src="top.png?v=20261001-3"
         alt="QR HUNTER 10th ANNIVERSARY"
         onload="showRealTop()"
         onerror="showDummyTop()"
