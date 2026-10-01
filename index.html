@@ -188,15 +188,58 @@ button{
   display:none;
 }
 
-.scroll-hint{
-  margin:0 0 2px;
-  text-align:center;
-  color:#8a6b26;
+/* TOP内スクロールバー：ロゴに合わせたネイビー */
+.top-actions{
+  scrollbar-width:thin;
+  scrollbar-color:#153b77 rgba(255,255,255,.45);
+}
+
+.top-actions::-webkit-scrollbar{
+  width:6px;
+}
+
+.top-actions::-webkit-scrollbar-track{
+  background:rgba(255,255,255,.45);
+  border-radius:999px;
+}
+
+.top-actions::-webkit-scrollbar-thumb{
+  background:#153b77;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.75);
+}
+
+/* Scroll表示はスクロールバー横に固定 */
+.scroll-side-hint{
+  position:absolute;
+  z-index:4;
+  right:5.5%;
+  top:61%;
+  transform:translate(55%,-50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  padding:7px 3px;
+  border-radius:999px;
+  background:rgba(255,255,255,.86);
+  color:#153b77;
   font-family:Georgia,"Times New Roman",serif;
-  font-size:clamp(13px,3.8vw,17px);
+  font-size:clamp(9px,2.4vw,12px);
   font-weight:700;
-  letter-spacing:.08em;
-  text-shadow:0 1px 0 rgba(255,255,255,.85);
+  line-height:1;
+  letter-spacing:.03em;
+  box-shadow:0 2px 8px rgba(21,59,119,.12);
+  pointer-events:none;
+}
+
+.scroll-side-hint .scroll-word{
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+}
+
+.scroll-side-hint .scroll-arrow{
+  font-size:1.1em;
 }
 
 .top-guide{
@@ -641,8 +684,6 @@ button{
 
       <div id="eventMessage"></div>
 
-      <div class="scroll-hint">Scroll ↓</div>
-
       <div class="top-guide">
 
         <p>
@@ -717,6 +758,11 @@ button{
 
       </div>
 
+    </div>
+
+    <div class="scroll-side-hint" aria-hidden="true">
+      <span class="scroll-word">Scroll</span>
+      <span class="scroll-arrow">↓</span>
     </div>
 
   </div>
@@ -3079,14 +3125,20 @@ async function boot(){
 
 
   /*
-   * 初期表示のチラつき防止：
-   * HTML側では新規発行ボタンを最初から隠している。
-   * 既存NOがある端末では新規GAME STARTを表示しない。
+   * TOPボタンを通信待ちにしない。
+   * 参加者No.が端末に無い場合はGAME STARTを即時表示する。
+   * 既存NOがある端末だけ新規GAME STARTを表示しない。
    */
   if(localNo){
 
     setExistingParticipantUI(
       true
+    );
+
+  }else{
+
+    setExistingParticipantUI(
+      false
     );
   }
 
