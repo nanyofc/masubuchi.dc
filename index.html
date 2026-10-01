@@ -258,15 +258,6 @@ button{
   font-size:clamp(12px,3.5vw,16px);
 }
 
-#continueButton{
-  margin:0;
-  border:1.5px solid #d6ab40;
-  border-radius:999px;
-  padding:13px 12px;
-  background:rgba(255,255,255,.95);
-  color:#153b77;
-}
-
 .notice{
   margin:0;
   padding:10px 12px;
@@ -690,15 +681,6 @@ button{
         <span class="jp">ゲームスタート</span>
       </button>
 
-      <button
-        id="continueButton"
-        class="btn btn-secondary"
-        style="display:none"
-        onclick="continueGame()"
-      >
-        続きから遊ぶ
-      </button>
-
       <div class="notice">
         <b>参加者No.について</b>
         ゲーム開始時に、参加者ごとの「参加者No.」が発行されます。<br>
@@ -711,7 +693,7 @@ button{
       <div class="restore-box">
 
         <div class="sub">
-          途中から再開する方
+          参加者No.を入力して再開
         </div>
 
         <div class="restore-row">
@@ -1407,11 +1389,6 @@ function setExistingParticipantUI(
       'issueButton'
     );
 
-  const continueButton =
-    document.getElementById(
-      'continueButton'
-    );
-
 
   if(issueButton){
 
@@ -1419,15 +1396,6 @@ function setExistingParticipantUI(
       hasExisting
         ? 'none'
         : 'block';
-  }
-
-
-  if(continueButton){
-
-    continueButton.style.display =
-      hasExisting
-        ? 'block'
-        : 'none';
   }
 }
 
@@ -1728,43 +1696,6 @@ async function restoreByNumber(){
       '4けたの参加者NOを入力してください'
     );
 
-    return;
-  }
-
-
-  setLoading(true);
-
-
-  const ok =
-    await restoreParticipant(
-      no
-    );
-
-
-  setLoading(false);
-
-
-  if(ok){
-
-    inspectReturnQuizNo =
-      null;
-
-    renderBingo();
-
-    showPage(
-      'pageBingo'
-    );
-  }
-}
-
-
-async function continueGame(){
-
-  const no =
-    getLocalParticipant();
-
-
-  if(!no){
     return;
   }
 
@@ -3150,7 +3081,7 @@ async function boot(){
   /*
    * 初期表示のチラつき防止：
    * HTML側では新規発行ボタンを最初から隠している。
-   * 既存NOがある端末だけ「つづきから」を先に表示する。
+   * 既存NOがある端末では新規GAME STARTを表示しない。
    */
   if(localNo){
 
@@ -3225,18 +3156,8 @@ async function boot(){
           'issueButton'
         );
 
-      const continueButton =
-        document.getElementById(
-          'continueButton'
-        );
-
       if(issueButton){
         issueButton.style.display =
-          'none';
-      }
-
-      if(continueButton){
-        continueButton.style.display =
           'none';
       }
 
