@@ -138,89 +138,202 @@ button{
    TOP
 ========================= */
 
-.top-image-wrap{
-  width:100%;
+#pageTop{
+  background:#fff;
+}
+
+.top-stage{
+  position:relative;
+  width:min(100%,640px);
+  margin:0 auto;
+  aspect-ratio:9 / 16;
   overflow:hidden;
   background:#fff;
+}
+
+.top-image-wrap{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
 }
 
 #topImage{
   display:block;
   width:100%;
-  height:auto;
+  height:100%;
+  object-fit:cover;
 }
 
 #topDummy{
-  min-height:360px;
-  padding:45px 22px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  background:
-    linear-gradient(
-      160deg,
-      #e6f9fd,
-      #fff 55%,
-      #e8fbff
-    );
-}
-
-#topDummy h1{
-  margin:0;
-  font-size:31px;
-  line-height:1.35;
-}
-
-#topDummy .anniv{
-  margin-bottom:15px;
-  font-size:17px;
-  font-weight:800;
-  color:#11a9d0;
+  display:none;
 }
 
 .top-actions{
-  padding:20px 16px 36px;
-  width:min(100%,640px);
-  margin:0 auto;
+  position:absolute;
+  z-index:2;
+  left:5.2%;
+  right:5.2%;
+  top:36.8%;
+  bottom:3.2%;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  overflow:auto;
+  padding:2px 2px 8px;
+  -webkit-overflow-scrolling:touch;
+}
+
+#eventMessage:empty{
+  display:none;
+}
+
+.top-guide{
+  padding:12px 14px;
+  border:1.5px solid rgba(215,163,52,.72);
+  border-radius:15px;
+  background:rgba(255,255,255,.92);
+  box-shadow:0 5px 18px rgba(30,52,95,.08);
+  color:#1a2d55;
+  font-size:clamp(11px,3.05vw,14px);
+  line-height:1.5;
+}
+
+.top-guide p{
+  margin:0 0 5px;
+}
+
+.top-guide p:last-child{
+  margin-bottom:0;
+}
+
+.top-guide strong{
+  color:#d81774;
+}
+
+.top-guide-note{
+  margin-top:7px !important;
+  padding-top:7px;
+  border-top:1px dashed rgba(205,153,42,.55);
+  font-size:.92em;
+  color:#4e5870;
+}
+
+#issueButton{
+  margin:0;
+  border:2px solid #f1b83c;
+  border-radius:999px;
+  padding:10px 12px 9px;
+  background:linear-gradient(180deg,#ff3c9b 0%,#e70070 55%,#c5005d 100%);
+  color:#fff;
+  box-shadow:
+    0 5px 0 #a6004c,
+    0 8px 18px rgba(160,0,75,.22),
+    inset 0 1px 0 rgba(255,255,255,.45);
+  text-shadow:0 2px 2px rgba(87,0,40,.35);
+}
+
+#issueButton .en{
+  display:block;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(23px,7vw,35px);
+  line-height:.95;
+  font-weight:900;
+}
+
+#issueButton .jp{
+  display:block;
+  margin-top:4px;
+  font-size:clamp(12px,3.5vw,16px);
+}
+
+#continueButton{
+  margin:0;
+  border:1.5px solid #d6ab40;
+  border-radius:999px;
+  padding:13px 12px;
+  background:rgba(255,255,255,.95);
+  color:#153b77;
 }
 
 .notice{
-  margin-top:16px;
-  padding:14px 15px;
+  margin:0;
+  padding:10px 12px;
+  border:1.5px solid rgba(215,163,52,.65);
   border-radius:14px;
-  background:#fff8dc;
-  line-height:1.6;
-  font-size:13px;
+  background:rgba(255,255,255,.92);
+  line-height:1.45;
+  font-size:clamp(10.5px,2.9vw,13px);
+  color:#26375d;
+}
+
+.notice b{
+  display:block;
+  margin-bottom:3px;
+  text-align:center;
+  color:#153b77;
+  font-size:1.08em;
 }
 
 .restore-box{
-  margin-top:20px;
-  padding-top:18px;
-  border-top:1px solid #ddd;
+  margin:0;
+  padding:10px 12px 11px;
+  border:1.5px solid rgba(69,132,216,.55);
+  border-radius:14px;
+  background:rgba(245,250,255,.94);
+}
+
+.restore-box .sub{
+  margin-bottom:8px;
+  text-align:center;
+  color:#153b77;
+  font-size:clamp(11px,3vw,13px);
+  font-weight:800;
 }
 
 .restore-row{
   display:flex;
+  flex-direction:column;
   gap:8px;
 }
 
 .restore-row input{
-  flex:1;
-  min-width:0;
-  padding:15px;
-  border:1px solid #bbb;
-  border-radius:12px;
-  font-size:18px;
+  width:100%;
+  padding:11px 10px;
+  border:1.5px solid #d0a23e;
+  border-radius:11px;
+  background:#fff;
+  font-size:16px;
   text-align:center;
-  letter-spacing:4px;
+  letter-spacing:2px;
 }
 
 .restore-row button{
-  width:auto;
+  width:100%;
   margin:0;
-  padding:12px 16px;
+  padding:11px 12px;
+  border:1.5px solid #d3aa43;
+  border-radius:11px;
+  background:#164fa8;
+  color:#fff;
+  font-weight:800;
+}
+
+@media(max-width:380px){
+  .top-actions{
+    top:36.5%;
+    gap:8px;
+  }
+
+  .top-guide{
+    padding:10px 11px;
+    line-height:1.42;
+  }
+
+  .notice,
+  .restore-box{
+    padding:9px 10px;
+  }
 }
 
 
@@ -509,90 +622,101 @@ button{
 ========================================= -->
 <section id="pageTop" class="page active">
 
-  <div class="top-image-wrap">
+  <div class="top-stage">
 
-    <img
-      id="topImage"
-      src="top.png"
-      alt="イベントTOP"
-      onload="showRealTop()"
-      onerror="showDummyTop()"
-    >
-
-    <div id="topDummy">
-      <div class="anniv">
-        10th ANNIVERSARY
-      </div>
-
-      <h1>
-        QRを探せ！<br>
-        BINGOクイズラリー
-      </h1>
-
-      <p class="sub">
-        院内にかくされたQRを探して<br>
-        クイズにチャレンジ！
-      </p>
+    <div class="top-image-wrap">
+      <img
+        id="topImage"
+        src="top.png?v=20261001-2"
+        alt="QR HUNTER 10th ANNIVERSARY"
+        onload="showRealTop()"
+        onerror="showDummyTop()"
+      >
+      <div id="topDummy"></div>
     </div>
 
-  </div>
+    <div class="top-actions">
 
+      <div id="eventMessage"></div>
 
-  <div class="top-actions">
+      <div class="top-guide">
 
-    <div id="eventMessage"></div>
+        <p>
+          院内・駐車場内に設置されたQRコードを探して、ミッションに挑戦しよう！
+        </p>
 
-    <button
-      id="issueButton"
-      class="btn btn-primary"
-      style="display:none"
-      onclick="showPage('pageProfile')"
-    >
-      ビンゴカードを発行する
-    </button>
+        <p>
+          QRコードをスマホで読み込むと、クイズ・謎解き等がスタートします。
+        </p>
 
-    <button
-      id="continueButton"
-      class="btn btn-secondary"
-      style="display:none"
-      onclick="continueGame()"
-    >
-      ビンゴのつづきから
-    </button>
+        <p>
+          正解・クリアすると、ビンゴカードのマスが1つ埋まります。
+        </p>
 
+        <p>
+          <strong>3列BINGO達成でガチャにチャレンジ！</strong>
+        </p>
 
-    <div class="notice">
-      <b>参加者NOについて</b><br>
-      ビンゴカードをつくると、
-      4けたの「参加者NO」が
-      ビンゴカードに表示されます。<br>
-      とちゅうで画面をとじたときに、
-      つづきからあそぶために使います。
-    </div>
+        <p>
+          景品が当たったら、当選画面をスタッフに見せて景品と引き換えてください。
+        </p>
 
+        <p class="top-guide-note">
+          QRコードは、スマホのカメラまたはビンゴカード画面の「QRカメラ」から読み込めます。
+        </p>
 
-    <div class="restore-box">
-
-      <div class="sub">
-        画面を閉じてしまった場合
       </div>
 
-      <div class="restore-row">
+      <button
+        id="issueButton"
+        class="btn btn-primary"
+        style="display:none"
+        onclick="showPage('pageProfile')"
+      >
+        <span class="en">GAME START</span>
+        <span class="jp">ゲームスタート</span>
+      </button>
 
-        <input
-          id="restoreNo"
-          type="tel"
-          maxlength="4"
-          inputmode="numeric"
-          placeholder="4けた"
-        >
+      <button
+        id="continueButton"
+        class="btn btn-secondary"
+        style="display:none"
+        onclick="continueGame()"
+      >
+        続きから遊ぶ
+      </button>
 
-        <button
-          class="btn btn-secondary"
-          onclick="restoreByNumber()"
-        >
-          復元
-        </button>
+      <div class="notice">
+        <b>参加者No.について</b>
+        ゲーム開始時に、参加者ごとの「参加者No.」が発行されます。<br>
+        参加者No.はビンゴカード画面にも表示されます。<br>
+        途中で画面を閉じた場合や、画面が消えてしまった場合は、TOP画面で参加者No.を入力すると続きから再開できます。
+      </div>
+
+      <div class="restore-box">
+
+        <div class="sub">
+          途中から再開する方
+        </div>
+
+        <div class="restore-row">
+
+          <input
+            id="restoreNo"
+            type="tel"
+            maxlength="4"
+            inputmode="numeric"
+            placeholder="参加者No.を入力"
+          >
+
+          <button
+            class="btn btn-secondary"
+            onclick="restoreByNumber()"
+          >
+            続きから遊ぶ
+          </button>
+
+        </div>
 
       </div>
 
@@ -601,7 +725,6 @@ button{
   </div>
 
 </section>
-
 
 <!-- ========================================
      参加者情報
